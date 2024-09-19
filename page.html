@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with LLM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f3f4f6;
+    }
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-window {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .chat-message {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+    }
+    .user-message {
+      background-color: #e1ffc7;
+      text-align: right;
+    }
+    .assistant-message {
+      background-color: #f1f1f1;
+    }
+    .input-container {
+      display: flex;
+      padding: 10px;
+      background: #e9ecef;
+      border-top: 1px solid #ddd;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .input-container button {
+      margin-left: 10px;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-window" id="chat-window"></div>
+  <div class="input-container">
+    <input type="text" id="user-input" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  let messages = [
+    { role: 'system', content: 'You are a helpful assistant.' }
+  ];
+
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const userMessage = input.value;
+    
+    if (!userMessage) return;
+
+    addMessage(userMessage, 'user');
+    input.value = '';
+
+    messages.push({ role: 'user', content: userMessage });
+
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ messages })
+    });
+
+    const result = await response.json();
+    const assistantMessage = result.response;
+
+    addMessage(assistantMessage, 'assistant');
+    messages.push({ role: 'assistant', content: assistantMessage });
+  }
+
+  function addMessage(content, sender) {
+    const chatWindow = document.getElementById('chat-window');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('chat-message', `${sender}-message`);
+    messageElement.textContent = content;
+    chatWindow.appendChild(messageElement);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
