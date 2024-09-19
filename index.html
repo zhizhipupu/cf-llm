@@ -90,7 +90,7 @@
 
     messages.push({ role: 'user', content: userMessage });
 
-    const response = await fetch('/chat', {
+    const response = await fetch('https://llm1.zeze120300.uk/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
